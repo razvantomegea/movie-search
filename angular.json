@@ -121,8 +121,16 @@
               "devServerTarget": "movie-search:serve:production"
             }
           }
+        },
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {}
         }
       }
-    }},
-  "defaultProject": "movie-search"
+    }
+  },
+  "defaultProject": "movie-search",
+  "cli": {
+    "analytics": "fbb8209f-0a74-49e0-a135-fadc2ee008a3"
+  }
 }

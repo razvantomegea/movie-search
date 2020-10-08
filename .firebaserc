@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "movie-search-46cb5": {
+      "hosting": {
+        "movie-search": [
+          "movie-search-46cb5"
+        ]
+      }
+    }
+  }
+}
