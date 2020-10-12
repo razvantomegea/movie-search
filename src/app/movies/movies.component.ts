@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { auth } from 'firebase/app';
+import { Movie, MovieFilter } from './movie.model';
 import { MoviesService } from './movies.service';
 
 @Component({
@@ -9,26 +9,52 @@ import { MoviesService } from './movies.service';
   styleUrls: ['./movies.component.scss']
 })
 export class MoviesComponent implements OnInit {
+  public isLoggedIn = false;
+  public movies: Array<Movie> = [];
 
-  constructor(private afAuth: AngularFireAuth, private moviesService: MoviesService) {
+  constructor(private moviesService: MoviesService) {
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
+    this.isLoggedIn = !!sessionStorage.getItem('session');
   }
 
-  public onLogin(): void {
-    this.afAuth.signInWithPopup(new auth.GoogleAuthProvider());
-  }
-
-  public onLogout(): void {
-    this.afAuth.signOut();
+  public async onLogin(): Promise<void> {
+    try {
+      const session: string = await this.moviesService.login();
+      this.isLoggedIn = true;
+      sessionStorage.setItem('session', session);
+    } catch (error) {
+      if (error.error.status_message) {
+        alert(error.error.status_message);
+      } else {
+        alert(error);
+      }
+    }
   }
 
   public onSearch(query: string): void {
-    console.log(query);
+    this.moviesService.searchMovies(query).subscribe((movies) => {
+      if (movies) {
+        this.movies = movies;
+      }
+    });
   }
 
-  public onFilter(filter: string): void {
+  public onFilter(filter: MovieFilter): void {
+    if (filter === 'favorites') {
+      this.moviesService.getFavoritesMovies().subscribe((movies) => {
+        if (movies) {
+          this.movies = movies;
+        }
+      });
+    } else {
+      this.moviesService.getPopularMovies().subscribe((movies) => {
+        if (movies) {
+          this.movies = movies;
+        }
+      });
+    }
 
   }
 

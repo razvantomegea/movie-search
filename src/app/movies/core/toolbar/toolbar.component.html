@@ -22,14 +22,14 @@
       <li class="nav-item active">
         <!-- Step 4: Close the menu when a link is clicked. -->
         <a
-          class="nav-link"
+          class="nav-link btn btn-outline-success"
           (click)="onFilterMovies('popular')"
         >Popular</a>
       </li>
-      <li class="nav-item active">
+      <li *ngIf="isLoggedIn" class="nav-item active">
         <!-- Step 4: Close the menu when a link is clicked. -->
         <a
-          class="nav-link"
+          class="nav-link btn btn-outline-success"
           (click)="onFilterMovies('favorites')"
         >Favorites</a>
       </li>
@@ -44,6 +44,8 @@
       type="search"
     />
     <button
+      *ngIf="!isLoggedIn"
+      (click)="onLogin()"
       class="btn btn-outline-success my-2 my-sm-0 login-btn"
       type="button"
     >Log in</button>

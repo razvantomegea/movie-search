@@ -1,3 +1,5 @@
+export type MovieFilter = 'popular' | 'favorites';
+
 export interface Movie {
  popularity: number;
  id: number;

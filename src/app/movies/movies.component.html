@@ -1,1 +1,11 @@
-<app-toolbar (filter)="onFilter($event)" (login)="onLogin()" (logout)="onLogout()" (search)="onSearch($event)"></app-toolbar>
+<app-toolbar
+  (filter)="onFilter($event)"
+  (login)="onLogin()"
+  (search)="onSearch($event)"
+  [isLoggedIn]="isLoggedIn"
+></app-toolbar>
+<div>
+  <ul>
+    <li *ngFor="let movie of movies">{{ movie.title }}</li>
+  </ul>
+</div>
