@@ -4,8 +4,30 @@
   (search)="onSearch($event)"
   [isLoggedIn]="isLoggedIn"
 ></app-toolbar>
-<div>
-  <ul>
-    <li *ngFor="let movie of movies">{{ movie.title }}</li>
-  </ul>
+
+<div class="container">
+  <div
+    class="row row-cols-xs-1 row-cols-sm-2 row-cols-md-3 row-cols-1 row-cols-lg-4 align-items-start justify-content-center"
+  >
+    <div
+      *ngFor="let movie of movies"
+      class="card col"
+    >
+      <img
+        [src]="getImgPath(movie.backdrop_path)"
+        class="card-img-top"
+        alt="..."
+      >
+      <div class="card-body">
+        <h5 class="card-title">{{ movie.title }}</h5>
+        <p class="card-text">{{ movie.overview }}</p>
+        <a
+          [routerLink]="movie.id"
+          class="btn btn-primary"
+        >Read more</a>
+        <button *ngIf="!movie.favorite" (click)="onAddToFavorites(movie)" class="btn btn-outline-primary">Add to favorites</button>
+        <button *ngIf="movie.favorite" (click)="onAddToFavorites(movie)" class="btn btn-outline-danger">Remove from favorites</button>
+      </div>
+    </div>
+  </div>
 </div>

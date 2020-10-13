@@ -15,30 +15,18 @@ export class MoviesComponent implements OnInit {
   constructor(private moviesService: MoviesService) {
   }
 
+  public getImgPath(src: string): string {
+    return `https://image.tmdb.org/t/p/w500/${src}`;
+  }
+
   public ngOnInit(): void {
     this.isLoggedIn = !!sessionStorage.getItem('session');
+    this.onFilter('popular');
   }
 
-  public async onLogin(): Promise<void> {
-    try {
-      const session: string = await this.moviesService.login();
-      this.isLoggedIn = true;
-      sessionStorage.setItem('session', session);
-    } catch (error) {
-      if (error.error.status_message) {
-        alert(error.error.status_message);
-      } else {
-        alert(error);
-      }
-    }
-  }
-
-  public onSearch(query: string): void {
-    this.moviesService.searchMovies(query).subscribe((movies) => {
-      if (movies) {
-        this.movies = movies;
-      }
-    });
+  public async onAddToFavorites(movie: Movie): Promise<void> {
+    movie.favorite = !movie.favorite;
+    await this.moviesService.addToFavorites(movie.id, movie.favorite);
   }
 
   public onFilter(filter: MovieFilter): void {
@@ -55,7 +43,29 @@ export class MoviesComponent implements OnInit {
         }
       });
     }
-
   }
 
+  public async onLogin(): Promise<void> {
+    try {
+      const session: string = await this.moviesService.login();
+      this.isLoggedIn = true;
+      sessionStorage.setItem('session', session);
+      const account = await this.moviesService.getAccount();
+      sessionStorage.setItem('account', `${account}`);
+    } catch (error) {
+      if (error.error.status_message) {
+        alert(error.error.status_message);
+      } else {
+        alert(error);
+      }
+    }
+  }
+
+  public onSearch(query: string): void {
+    this.moviesService.searchMovies(query).subscribe((movies) => {
+      if (movies) {
+        this.movies = movies;
+      }
+    });
+  }
 }

@@ -18,26 +18,115 @@ interface MovieSearchResponse {
   providedIn: 'root'
 })
 export class MoviesService {
-
   constructor(private httpClient: HttpClient) { }
+
+  public addToFavorites(id: number, favorite: boolean): Promise<boolean> {
+    const params: HttpParams = new HttpParams({
+      fromObject: {
+        api_key: API_KEY,
+        session_id: sessionStorage.getItem('session')
+      }
+    });
+
+    const body = {
+      media_type: 'movie',
+      favorite,
+      media_id: id
+    };
+
+    const account: string = sessionStorage.getItem('account') || '';
+
+    return this.httpClient.post(
+      `${MOVIE_API_URL}account/${account}/favorite`, body, { observe: 'response', params }
+    )
+      .pipe(map((response: HttpResponse<MovieSearchResponse>) => {
+        if (response && response.status === 201) {
+          return true;
+        }
+      }), take(1)).toPromise();
+  }
+
+  public authorizeToken(token: string): Promise<string> {
+    const params: HttpParams = new HttpParams({
+      fromObject: {
+        api_key: API_KEY
+      }
+    });
+
+    const body = {
+      username: 'razvantomegea',
+      password: 'Tr19407#!',
+      request_token: token
+    }
+
+    return this.httpClient.post(`${MOVIE_API_URL}authentication/token/validate_with_login`,
+      body,
+      { observe: 'response', params }
+    )
+      .pipe(map((response: HttpResponse<{ success: boolean; request_token: string }>) => {
+        if (response && response.status === 200 && response.body.success) {
+          return response.body.request_token;
+        }
+      }),
+        take(1)
+      ).toPromise();
+  }
+
+  public async getAccount(): Promise<number> {
+    const params: HttpParams = new HttpParams({
+      fromObject: {
+        api_key: API_KEY,
+        session_id: sessionStorage.getItem('session')
+      }
+    });
+
+    return this.httpClient.get(`${MOVIE_API_URL}account`,
+      { observe: 'response', params }
+    )
+      .pipe(map((response: HttpResponse<{ id: number }>) => {
+        if (response && response.status === 200) {
+          return response.body.id;
+        }
+      }),
+        take(1)
+      ).toPromise();
+  }
 
   public getFavoritesMovies(): Observable<Array<Movie>> {
     const params: HttpParams = new HttpParams({
       fromObject: {
         api_key: API_KEY,
-        session_id: sessionStorage.getItem('session'),
-        page: `${1}`,
-        sort_by: 'created_at.asc'
+        session_id: sessionStorage.getItem('session')
       }
     });
 
-    return this.httpClient.get(`${MOVIE_API_URL}/account/favorite/movies`, { observe: 'response', params })
+    const account: string = sessionStorage.getItem('account') || '';
+
+    return this.httpClient.get(
+      `${MOVIE_API_URL}account/${account}/favorite/movies`, { observe: 'response', params }
+    )
       .pipe(map((response: HttpResponse<MovieSearchResponse>) => {
         if (response && response.status === 200) {
           return response.body.results;
         }
       })
       );
+  }
+
+  public getMovieDetails(id: number): Promise<Movie> {
+    const params: HttpParams = new HttpParams({
+      fromObject: {
+        api_key: API_KEY
+      }
+    });
+
+    return this.httpClient.get(`${MOVIE_API_URL}movie/${id}`, { observe: 'response', params })
+      .pipe(map((response: HttpResponse<Movie>) => {
+        if (response && response.status === 200) {
+          return response.body;
+        }
+      }), take(1)
+      ).toPromise();
   }
 
   public getPopularMovies(): Observable<Array<Movie>> {
@@ -79,7 +168,7 @@ export class MoviesService {
   }
 
   public async login(): Promise<string> {
-    const token: string = await this.getToken();
+    const token: string = await this.authorizeToken(await this.getToken());
     const params: HttpParams = new HttpParams({
       fromObject: {
         api_key: API_KEY
@@ -122,6 +211,4 @@ export class MoviesService {
       })
       );
   }
-
-  // #endregion Public Methods (5)
 }
