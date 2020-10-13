@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "allowedCommonJsDependencies": ["@angular/fire/firestore", "@firebase/auth"],
+            "allowedCommonJsDependencies": ["@angular/fire/firestore", "@firebase/auth", "rxjs"],
             "outputPath": "dist/movie-search",
             "index": "src/index.html",
             "main": "src/main.ts",
